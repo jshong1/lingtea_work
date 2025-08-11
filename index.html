@@ -867,8 +867,8 @@
                     format: 'a4'
                 });
 
-                // 페이지당 최대 항목 수를 15개로 변경
-                const itemsPerPage = 15; // 한 페이지에 들어갈 수 있는 최대 항목 수
+                // 페이지당 최대 항목 수를 14개로 변경
+                const itemsPerPage = 14; // 한 페이지에 들어갈 수 있는 최대 항목 수
                 const totalItems = parsedData.items.length;
                 const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -892,9 +892,9 @@
                     // 잠시 대기 (렌더링 완료를 위해)
                     await new Promise(resolve => setTimeout(resolve, 200));
 
-                    // HTML2Canvas로 이미지 생성
+                    // HTML2Canvas로 이미지 생성 (용량 최적화)
                     const canvas = await html2canvas(pdfTemplate, {
-                        scale: 2,
+                        scale: 1.5, // 2에서 1.5로 감소
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: '#ffffff',
@@ -909,8 +909,8 @@
                         pdf.addPage();
                     }
 
-                    // 캔버스 이미지를 PDF에 추가
-                    const imgData = canvas.toDataURL('image/png', 1.0);
+                    // 캔버스 이미지를 PDF에 추가 (압축률 조정)
+                    const imgData = canvas.toDataURL('image/jpeg', 0.8); // PNG에서 JPEG로, 품질 0.8
                     const imgWidth = 210; // A4 width in mm
                     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -918,7 +918,7 @@
                     const maxHeight = 280; // A4 높이에서 여백 제외
                     const finalHeight = Math.min(imgHeight, maxHeight);
 
-                    pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, finalHeight);
+                    pdf.addImage(imgData, 'JPEG', 0, 10, imgWidth, finalHeight); // PNG에서 JPEG로 변경
                 }
 
                 // 템플릿 다시 숨기기
