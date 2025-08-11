@@ -928,8 +928,28 @@
                 pdfTemplate.style.zIndex = 'auto';
                 pdfTemplate.style.visibility = 'hidden';
 
-                // PDF 다운로드
-                const fileName = `거래명세서_${new Date().getFullYear()}${(new Date().getMonth()+1).toString().padStart(2,'0')}${new Date().getDate().toString().padStart(2,'0')}.pdf`;
+                // PDF 다운로드 (파일명 규칙 변경)
+                const customer = parsedData.거래처코드2 || '거래처미상'; // O2 데이터
+                const deliveryDate = parsedData.납품일 || ''; // B2 데이터
+                
+                // 납품일에서 연월일만 추출 (YYMMDD 형식)
+                let dateStr = '';
+                if (deliveryDate) {
+                    // 날짜 형식이 YYYY-MM-DD 또는 YYYY-MM-DD HH:MM인 경우
+                    const dateMatch = deliveryDate.match(/(\d{4})-(\d{2})-(\d{2})/);
+                    if (dateMatch) {
+                        const year = dateMatch[1].slice(-2); // 뒤 2자리
+                        const month = dateMatch[2];
+                        const day = dateMatch[3];
+                        dateStr = year + month + day; // YYMMDD
+                    } else {
+                        dateStr = '날짜미상';
+                    }
+                } else {
+                    dateStr = '날짜미상';
+                }
+                
+                const fileName = `거래명세서_${customer}_${dateStr}.pdf`;
                 pdf.save(fileName);
 
                 showStatus(`PDF가 성공적으로 생성되었습니다! (총 ${totalPages}페이지)`, 'success');
